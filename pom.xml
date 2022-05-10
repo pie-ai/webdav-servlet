@@ -13,6 +13,7 @@
     <description>A Java Servlet that provides an implementation of the WebDAV protocol.
     </description>
     <url>https://github.com/dheid/webdav-servlet</url>
+    <inceptionYear>2006</inceptionYear>
 
     <scm>
         <connection>scm:git:git@github.com:dheid/webdav-servlet.git</connection>
@@ -22,8 +23,8 @@
     </scm>
 
     <organization>
-        <name>drjekyll.org</name>
-        <url>https://github.com/drjekyll-org</url>
+        <name>Daniel Heid</name>
+        <url>https://www.daniel-heid.de/</url>
     </organization>
 
     <developers>
@@ -49,8 +50,11 @@
             <id>ossrh</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
+        <site>
+            <id>github</id>
+            <url>scm:git:git@github.com:dheid/webdav-servlet.git</url>
+        </site>
     </distributionManagement>
-    <inceptionYear>2006</inceptionYear>
 
     <issueManagement>
         <system>GitHub</system>
@@ -189,7 +193,16 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-site-plugin</artifactId>
-                    <version>3.12.0</version>
+                    <version>4.0.0-M1</version>
+                    <executions>
+                        <execution>
+                            <id>generate-site</id>
+                            <goals>
+                                <goal>site</goal>
+                                <goal>stage</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -202,10 +215,10 @@
                     <version>3.2.1</version>
                     <executions>
                         <execution>
+                            <id>attach-sources</id>
                             <goals>
                                 <goal>jar-no-fork</goal>
                             </goals>
-                            <id>attach-sources</id>
                         </execution>
                     </executions>
                 </plugin>
@@ -218,10 +231,26 @@
                     </configuration>
                     <executions>
                         <execution>
+                            <id>attach-javadocs</id>
                             <goals>
                                 <goal>jar</goal>
                             </goals>
-                            <id>attach-javadocs</id>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-scm-publish-plugin</artifactId>
+                    <version>3.1.0</version>
+                    <configuration>
+                        <scmBranch>site</scmBranch>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>publish-site</id>
+                            <goals>
+                                <goal>publish-scm</goal>
+                            </goals>
                         </execution>
                     </executions>
                 </plugin>
@@ -231,11 +260,11 @@
                     <version>3.0.1</version>
                     <executions>
                         <execution>
+                            <id>sign-artifacts</id>
+                            <phase>verify</phase>
                             <goals>
                                 <goal>sign</goal>
                             </goals>
-                            <id>sign-artifacts</id>
-                            <phase>verify</phase>
                         </execution>
                     </executions>
                 </plugin>
@@ -262,11 +291,11 @@
                 </configuration>
                 <executions>
                     <execution>
+                        <phase>compile</phase>
                         <goals>
                             <goal>display-dependency-updates</goal>
                             <goal>display-plugin-updates</goal>
                         </goals>
-                        <phase>compile</phase>
                     </execution>
                 </executions>
             </plugin>
@@ -276,6 +305,10 @@
                 <version>3.0.0</version>
                 <executions>
                     <execution>
+                        <id>enforce-maven</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
                         <configuration>
                             <rules>
                                 <requireMavenVersion>
@@ -283,15 +316,20 @@
                                 </requireMavenVersion>
                             </rules>
                         </configuration>
-                        <goals>
-                            <goal>enforce</goal>
-                        </goals>
-                        <id>enforce-maven</id>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
     </build>
+
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </reporting>
 
     <profiles>
         <profile>
@@ -299,20 +337,28 @@
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
-                        <groupId>org.apache.maven.plugins</groupId>
                     </plugin>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <groupId>org.apache.maven.plugins</groupId>
                     </plugin>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-site-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-scm-publish-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <groupId>org.apache.maven.plugins</groupId>
                     </plugin>
                     <plugin>
-                        <artifactId>nexus-staging-maven-plugin</artifactId>
                         <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
                     </plugin>
                 </plugins>
             </build>

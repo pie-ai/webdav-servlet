@@ -132,3 +132,8 @@ e.g.:
 
 * Forked and modernized the library and did an initial release
 
+## Generate the site
+
+To generate the Maven site, just execute
+
+    mvn javadoc:jar site site:stage scm-publish:publish-scm
