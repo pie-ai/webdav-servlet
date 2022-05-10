@@ -19,8 +19,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.Arrays;
 import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
@@ -113,7 +114,7 @@ public class DoGet extends DoHead {
                 // TODO some folder response (for browsers, DAV tools
                 // use propfind) in html?
                 Locale locale = req.getLocale();
-                DateFormat shortDF = getDateTimeFormat(locale);
+                DateTimeFormatter shortDF = getDateTimeFormat(locale);
                 resp.setContentType("text/html");
                 resp.setCharacterEncoding("UTF8");
                 OutputStream out = resp.getOutputStream();
@@ -131,8 +132,7 @@ public class DoGet extends DoHead {
                 childrenTemp.append("<body>");
                 childrenTemp.append(getHeader(transaction, path, resp, req));
                 childrenTemp.append("<table>");
-                childrenTemp.append(
-                    "<tr><th>Name</th><th>Size</th><th>Created</th><th>Modified</th></tr>");
+                childrenTemp.append("<tr><th>Name</th><th>Size</th><th>Created</th><th>Modified</th></tr>");
                 childrenTemp.append("<tr>");
                 childrenTemp.append("<td colspan=\"4\"><a href=\"../\">Parent</a></td></tr>");
                 boolean isEven = false;
@@ -195,11 +195,11 @@ public class DoGet extends DoHead {
      * @param browserLocale
      * @return DateFormat used to display creation and modification dates
      */
-    protected DateFormat getDateTimeFormat(Locale browserLocale) {
-        return SimpleDateFormat.getDateTimeInstance(DateFormat.SHORT,
-            DateFormat.MEDIUM,
-            browserLocale
-        );
+    protected static DateTimeFormatter getDateTimeFormat(Locale browserLocale) {
+        return DateTimeFormatter
+            .ofLocalizedDateTime(FormatStyle.SHORT, FormatStyle.MEDIUM)
+            .withLocale(browserLocale)
+            .withZone(ZoneId.systemDefault());
     }
 
     /**

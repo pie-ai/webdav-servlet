@@ -108,7 +108,7 @@ public class DoGetTest {
                 oneOf(mockReq).getHeader("If-None-Match");
                 will(returnValue(null));
 
-                oneOf(mockRes).setDateHeader("last-modified", indexSo.getLastModified().getTime());
+                oneOf(mockRes).setDateHeader("last-modified", indexSo.getLastModified().toEpochMilli());
 
                 oneOf(mockRes).addHeader(with(any(String.class)), with(any(String.class)));
 
@@ -262,8 +262,7 @@ public class DoGetTest {
                 oneOf(mockReq).getHeader("If-None-Match");
                 will(returnValue(null));
 
-                oneOf(mockRes).setDateHeader("last-modified",
-                    alternativeSo.getLastModified().getTime()
+                oneOf(mockRes).setDateHeader("last-modified", alternativeSo.getLastModified().toEpochMilli()
                 );
 
                 oneOf(mockRes).addHeader(with(any(String.class)), with(any(String.class)));

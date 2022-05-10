@@ -19,15 +19,19 @@
 
 package org.drjekyll.webdav.store;
 
-import java.util.Date;
+import java.time.Instant;
+import lombok.Getter;
+import lombok.Setter;
 
+@Setter
+@Getter
 public class StoredObject {
 
     private boolean folder;
 
-    private Date lastModified;
+    private Instant lastModified;
 
-    private Date creationDate;
+    private Instant creationDate;
 
     private long resourceLength;
 
@@ -38,82 +42,10 @@ public class StoredObject {
     /**
      * Determines whether the StoredObject is a folder or a resource
      *
-     * @return true if the StoredObject is a collection
-     */
-    public boolean isFolder() {
-        return folder;
-    }
-
-    /**
-     * Sets a new StoredObject as a collection or resource
-     *
-     * @param f true - collection ; false - resource
-     */
-    public void setFolder(boolean f) {
-        folder = f;
-    }
-
-    /**
-     * Determines whether the StoredObject is a folder or a resource
-     *
      * @return true if the StoredObject is a resource
      */
     public boolean isResource() {
         return !folder;
-    }
-
-    /**
-     * Gets the date of the last modification
-     *
-     * @return last modification Date
-     */
-    public Date getLastModified() {
-        return lastModified;
-    }
-
-    /**
-     * Sets the date of the last modification
-     *
-     * @param d date of the last modification
-     */
-    public void setLastModified(Date d) {
-        lastModified = d;
-    }
-
-    /**
-     * Gets the date of the creation
-     *
-     * @return creation Date
-     */
-    public Date getCreationDate() {
-        return creationDate;
-    }
-
-    /**
-     * Sets the date of the creation
-     *
-     * @param c date of the creation
-     */
-    public void setCreationDate(Date c) {
-        creationDate = c;
-    }
-
-    /**
-     * Gets the length of the resource content
-     *
-     * @return length of the resource content
-     */
-    public long getResourceLength() {
-        return resourceLength;
-    }
-
-    /**
-     * Sets the length of the resource content
-     *
-     * @param l the length of the resource content
-     */
-    public void setResourceLength(long l) {
-        resourceLength = l;
     }
 
     /**
@@ -135,28 +67,8 @@ public class StoredObject {
         folder = false;
         creationDate = null;
         lastModified = null;
-        // this.content = null;
         resourceLength = 0;
         mimeType = null;
-    }
-
-    /**
-     * Retrieve the myme type from the store object. Can also return NULL if the store does not
-     * handle mime type stuff. In that case the mime type is determined by the servletcontext
-     *
-     * @return the mimeType
-     */
-    public String getMimeType() {
-        return mimeType;
-    }
-
-    /**
-     * Set the mime type of this object
-     *
-     * @param mimeType the mimeType to set
-     */
-    public void setMimeType(String mimeType) {
-        this.mimeType = mimeType;
     }
 
 }

@@ -1,6 +1,6 @@
 package org.drjekyll.webdav;
 
-import java.util.Date;
+import java.time.Instant;
 import org.drjekyll.webdav.locking.LockedObject;
 import org.drjekyll.webdav.locking.ResourceLocks;
 import org.drjekyll.webdav.store.StoredObject;
@@ -15,8 +15,8 @@ public final class StoreObjectTestUtil {
     ) {
         StoredObject so = new StoredObject();
         so.setFolder(isFolder);
-        so.setCreationDate(new Date());
-        so.setLastModified(new Date());
+        so.setCreationDate(Instant.ofEpochSecond(123L));
+        so.setLastModified(Instant.ofEpochSecond(456L));
         if (!isFolder) {
             // so.setResourceContent(resourceContent);
             so.setResourceLength(resourceContent.length);

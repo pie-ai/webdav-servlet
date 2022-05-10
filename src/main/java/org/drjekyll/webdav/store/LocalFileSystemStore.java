@@ -23,8 +23,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.security.Principal;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
@@ -215,8 +215,8 @@ public class LocalFileSystemStore implements WebdavStore {
         if (file.exists()) {
             so = new StoredObject();
             so.setFolder(file.isDirectory());
-            so.setLastModified(new Date(file.lastModified()));
-            so.setCreationDate(new Date(file.lastModified()));
+            so.setLastModified(Instant.ofEpochMilli(file.lastModified()));
+            so.setCreationDate(Instant.ofEpochMilli(file.lastModified()));
             so.setResourceLength(getResourceLength(transaction, uri));
         }
 

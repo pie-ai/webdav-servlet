@@ -18,15 +18,13 @@ package org.drjekyll.webdav.methods;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.TimeZone;
 import javax.annotation.Nullable;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -55,17 +53,19 @@ public abstract class Method implements MethodExecutor {
      */
     protected static final int INFINITY = 3;
 
+    public static final ZoneId GMT_ZONE_ID = ZoneId.of("Etc/GMT");
+
     /**
      * Simple date format for the creation date ISO 8601 representation (partial).
      */
-    protected static final String CREATION_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+    protected static final DateTimeFormatter CREATION_DATE_FORMAT = DateTimeFormatter.ofPattern(
+        "yyyy-MM-dd'T'HH:mm:ss'Z'").withZone(GMT_ZONE_ID);
 
     /**
      * Simple date format for the last modified date. (RFC 822 updated by RFC 1123)
      */
-    protected static final String LAST_MODIFIED_DATE_FORMAT = "EEE, dd MMM yyyy HH:mm:ss z";
-
-    protected static final String LOCAL_DATE_FORMAT = "dd/MM/yy' 'HH:mm:ss";
+    protected static final DateTimeFormatter LAST_MODIFIED_DATE_FORMAT = DateTimeFormatter.ofPattern(
+        "EEE, dd MMM yyyy HH:mm:ss z").withZone(GMT_ZONE_ID);
 
     /**
      * size of the io-buffer
@@ -92,12 +92,6 @@ public abstract class Method implements MethodExecutor {
      */
     protected static final int TEMP_TIMEOUT = 10;
 
-    private static final ThreadLocal<DateFormat> TH_LASTMODIFIED_DATE_FORMAT = new ThreadLocal<>();
-
-    private static final ThreadLocal<DateFormat> TH_CREATION_DATE_FORMAT = new ThreadLocal<>();
-
-    private static final ThreadLocal<DateFormat> TH_LOCAL_DATE_FORMAT = new ThreadLocal<>();
-
     static {
         /*
          * GMT timezone - all HTTP dates are on GMT
@@ -110,34 +104,13 @@ public abstract class Method implements MethodExecutor {
         URL_ENCODER.addSafeCharacter('/');
     }
 
-    public static String lastModifiedDateFormat(final Date date) {
-        DateFormat df = TH_LASTMODIFIED_DATE_FORMAT.get();
-        if (df == null) {
-            df = new SimpleDateFormat(LAST_MODIFIED_DATE_FORMAT, Locale.US);
-            df.setTimeZone(TimeZone.getTimeZone("GMT"));
-            TH_LASTMODIFIED_DATE_FORMAT.set(df);
-        }
-        return df.format(date);
+    public static String lastModifiedDateFormat(TemporalAccessor temporalAccessor) {
+        return LAST_MODIFIED_DATE_FORMAT.format(temporalAccessor);
     }
 
-    public static String creationDateFormat(final Date date) {
-        DateFormat df = TH_CREATION_DATE_FORMAT.get();
-        if (df == null) {
-            df = new SimpleDateFormat(CREATION_DATE_FORMAT);
-            df.setTimeZone(TimeZone.getTimeZone("GMT"));
-            TH_CREATION_DATE_FORMAT.set(df);
-        }
-        return df.format(date);
+    public static String creationDateFormat(TemporalAccessor temporalAccessor) {
+        return CREATION_DATE_FORMAT.format(temporalAccessor);
     }
-
-    public static String getLocalDateFormat(final Date date, final Locale loc) {
-        DateFormat df = TH_LOCAL_DATE_FORMAT.get();
-        if (df == null) {
-            df = new SimpleDateFormat(LOCAL_DATE_FORMAT, loc);
-        }
-        return df.format(date);
-    }
-
 
     /**
      * Return the relative path associated with this servlet.
@@ -165,8 +138,7 @@ public abstract class Method implements MethodExecutor {
     }
 
     /**
-     * creates the parent path from the given path by removing the last '/' and everything after
-     * that
+     * creates the parent path from the given path by removing the last '/' and everything after that
      *
      * @param path the path
      * @return parent path
@@ -248,7 +220,7 @@ public abstract class Method implements MethodExecutor {
 
         if (so != null && so.isResource()) {
             resourceLength = Long.toString(so.getResourceLength());
-            lastModified = Long.toString(so.getLastModified().getTime());
+            lastModified = Long.toString(so.getLastModified().toEpochMilli());
         }
 
         return "W/\"" + resourceLength + '-' + lastModified + '"';
@@ -266,15 +238,15 @@ public abstract class Method implements MethodExecutor {
     }
 
     /**
-     * Checks if locks on resources at the given path exists and if so checks the If-Header to make
-     * sure the If-Header corresponds to the locked resource. Returning true if no lock exists or
-     * the If-Header is corresponding to the locked resource
+     * Checks if locks on resources at the given path exists and if so checks the If-Header to make sure the If-Header
+     * corresponds to the locked resource. Returning true if no lock exists or the If-Header is corresponding to the
+     * locked resource
      *
      * @param req           Servlet request
      * @param resourceLocks
      * @param path          path to the resource
-     * @return true if no lock on a resource with the given path exists or if the If-Header
-     * corresponds to the locked resource
+     * @return true if no lock on a resource with the given path exists or if the If-Header corresponds to the locked
+     * resource
      * @throws LockFailedException
      */
     protected static boolean checkLocks(
@@ -340,9 +312,8 @@ public abstract class Method implements MethodExecutor {
     }
 
     /**
-     * Send a multistatus element containing a complete error report to the client. If the errorList
-     * contains only one error, send the error directly without wrapping it in a multistatus
-     * message.
+     * Send a multistatus element containing a complete error report to the client. If the errorList contains only one
+     * error, send the error directly without wrapping it in a multistatus message.
      *
      * @param req       Servlet request
      * @param resp      Servlet response
@@ -380,8 +351,7 @@ public abstract class Method implements MethodExecutor {
                 generatedXML.writeText(errorPath);
                 generatedXML.writeElement("DAV::href", XMLWriter.CLOSING);
                 generatedXML.writeElement("DAV::status", XMLWriter.OPENING);
-                generatedXML.writeText("HTTP/1.1 " + errorCode + ' ' + WebdavStatus.getStatusText(
-                    errorCode));
+                generatedXML.writeText("HTTP/1.1 " + errorCode + ' ' + WebdavStatus.getStatusText(errorCode));
                 generatedXML.writeElement("DAV::status", XMLWriter.CLOSING);
 
                 generatedXML.writeElement("DAV::response", XMLWriter.CLOSING);

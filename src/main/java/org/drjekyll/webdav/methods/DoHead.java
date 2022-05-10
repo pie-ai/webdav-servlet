@@ -127,7 +127,7 @@ public class DoHead extends Method {
                         } else {
 
                             // setting headers
-                            long lastModified = so.getLastModified().getTime();
+                            long lastModified = so.getLastModified().toEpochMilli();
                             resp.setDateHeader("last-modified", lastModified);
 
                             String eTag = getETag(so);
