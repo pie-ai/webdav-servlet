@@ -63,13 +63,13 @@ public class WebdavServlet extends HttpServlet {
 
     private static final long serialVersionUID = -8439635344436347628L;
 
-    private final ResourceLocks resourceLocks;
+    private transient ResourceLocks resourceLocks = new ResourceLocks();
 
     private final HashMap<String, MethodExecutor> methods = new HashMap<>();
 
     private WebdavStore store;
 
-    public WebdavServlet() {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         resourceLocks = new ResourceLocks();
     }
 
