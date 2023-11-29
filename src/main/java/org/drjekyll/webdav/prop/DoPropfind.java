@@ -109,7 +109,7 @@ public class DoPropfind extends Method {
                 int propertyFindType = FIND_ALL_PROP;
                 Node propNode = null;
 
-                if (req.getContentLength() != 0) {
+                if (req.getContentLength() > 0) {
                     DocumentBuilder documentBuilder = getDocumentBuilder();
                     try {
                         Document document =
@@ -126,6 +126,7 @@ public class DoPropfind extends Method {
                             propertyFindType = FIND_ALL_PROP;
                         }
                     } catch (Exception e) {
+                        log.error("could not build document: {}", e.getMessage(), e);
                         resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                         return;
                     }
